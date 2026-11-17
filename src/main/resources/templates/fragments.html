@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' - Billing'">Billing</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:fragment="nav(active)" class="topbar">
+    <a class="brand" th:href="@{/invoices}">Billing</a>
+    <nav>
+        <a th:href="@{/invoices}" th:classappend="${active == 'invoices'} ? 'on'">Bills</a>
+        <a th:href="@{/customers}" th:classappend="${active == 'customers'} ? 'on'">Customers</a>
+        <a th:href="@{/products}" th:classappend="${active == 'products'} ? 'on'">Products</a>
+    </nav>
+</header>
+</body>
+</html>

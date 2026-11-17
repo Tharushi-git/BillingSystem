@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Create bill')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('invoices')}"></header>
+<main>
+    <h1>Create bill</h1>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <p class="error" th:if="${#lists.isEmpty(customers)}">
+        You need a customer first. <a th:href="@{/customers}">Add a customer</a>.
+    </p>
+
+    <form th:action="@{/invoices}" method="post" class="panel">
+        <label>Customer
+            <select name="customerId" required>
+                <option value="">Choose a customer</option>
+                <option th:each="c : ${customers}" th:value="${c.id}"
+                        th:text="${c.name} + ' (' + ${c.email} + ')'"></option>
+            </select>
+        </label>
+
+        <table class="lines">
+            <thead><tr><th>Item</th><th>Quantity</th><th class="num">Line total</th><th></th></tr></thead>
+            <tbody id="rows">
+            <tr class="row">
+                <td>
+                    <select name="productId">
+                        <option value="" data-price="0">Choose an item</option>
+                        <option th:each="p : ${products}" th:value="${p.id}" th:attr="data-price=${p.price}"
+                                th:disabled="${p.stock == 0}"
+                                th:text="${p.name} + ' - Rs. ' + ${p.price} + ' (' + ${p.stock} + ' in stock)'"></option>
+                    </select>
+                </td>
+                <td><input type="number" name="quantity" min="1" value="1"></td>
+                <td class="num line-total">0.00</td>
+                <td><button type="button" class="link remove">Remove</button></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="actions">
+            <button type="button" class="secondary" id="addRow">Add another item</button>
+            <p class="estimate">Subtotal <strong id="subtotal">0.00</strong> <small>(tax is added when you create the bill)</small></p>
+        </div>
+        <button type="submit">Create bill</button>
+    </form>
+</main>
+
+<script>
+    const rows = document.getElementById('rows');
+    const template = rows.querySelector('.row').cloneNode(true);
+
+    function recalc() {
+        let subtotal = 0;
+        rows.querySelectorAll('.row').forEach(function (row) {
+            const price = parseFloat(row.querySelector('select').selectedOptions[0].dataset.price || 0);
+            const qty = parseInt(row.querySelector('input').value || 0, 10);
+            const line = price * (qty > 0 ? qty : 0);
+            row.querySelector('.line-total').textContent = line.toFixed(2);
+            subtotal += line;
+        });
+        document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+    }
+
+    document.getElementById('addRow').addEventListener('click', function () {
+        rows.appendChild(template.cloneNode(true));
+        recalc();
+    });
+
+    rows.addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove') && rows.querySelectorAll('.row').length > 1) {
+            e.target.closest('.row').remove();
+            recalc();
+        }
+    });
+
+    rows.addEventListener('input', recalc);
+    rows.addEventListener('change', recalc);
+</script>
+</body>
+</html>

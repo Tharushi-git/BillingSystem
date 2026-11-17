@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Customers')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('customers')}"></header>
+<main>
+    <h1>Customers</h1>
+    <p class="flash" th:if="${message}" th:text="${message}"></p>
+
+    <form th:action="@{/customers}" th:object="${customer}" method="post" class="panel form-grid">
+        <label>Name
+            <input type="text" th:field="*{name}">
+            <small class="err" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></small>
+        </label>
+        <label>Email
+            <input type="email" th:field="*{email}">
+            <small class="err" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+        </label>
+        <label>Phone (optional)
+            <input type="text" th:field="*{phone}">
+        </label>
+        <button type="submit">Add customer</button>
+    </form>
+
+    <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th></tr></thead>
+        <tbody>
+        <tr th:each="c : ${customers}">
+            <td th:text="${c.name}"></td>
+            <td th:text="${c.email}"></td>
+            <td th:text="${c.phone}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(customers)}"><td colspan="3" class="empty">No customers yet. Add the first one above.</td></tr>
+        </tbody>
+    </table>
+</main>
+</body>
+</html>
